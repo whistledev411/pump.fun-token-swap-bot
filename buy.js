@@ -90,52 +90,7 @@ const AUTO_SELL = (0, utils_2.retrieveEnvVariable)('AUTO_SELL', exports.logger) 
 const MAX_SELL_RETRIES = Number((0, utils_2.retrieveEnvVariable)('MAX_SELL_RETRIES', exports.logger));
 const MIN_POOL_SIZE = (0, utils_2.retrieveEnvVariable)('MIN_POOL_SIZE', exports.logger);
 let snipeList = [];
-function init() {
-    return __awaiter(this, void 0, void 0, function* () {
-        // get wallet
-        const PRIVATE_KEY = (0, utils_2.retrieveEnvVariable)('PRIVATE_KEY', exports.logger); 
-        exports.logger.info(`Welcome to Paxel Bot`); 
-        wallet = web3_js_1.Keypair.fromSecretKey(bs58_1.default.decode(PRIVATE_KEY));
-        exports.logger.info(`Your Wallet Address : ${wallet.publicKey}`);
-        // get quote mint and amount
-        const QUOTE_MINT = (0, utils_2.retrieveEnvVariable)('QUOTE_MINT', exports.logger);
-        const QUOTE_AMOUNT = (0, utils_2.retrieveEnvVariable)('QUOTE_AMOUNT', exports.logger); 
-        // Convert the balance from lamports to SOL (1 SOL = 1,000,000,000 lamports) 
-        switch (QUOTE_MINT) {
-            case 'WSOL': {
-                quoteToken = raydium_sdk_1.Token.WSOL;
-                quoteAmount = new raydium_sdk_1.TokenAmount(raydium_sdk_1.Token.WSOL, QUOTE_AMOUNT, false);
-                quoteMinPoolSizeAmount = new raydium_sdk_1.TokenAmount(quoteToken, MIN_POOL_SIZE, false);
-                break; 
-            }
-            default: {
-                throw new Error(`Unsupported quote mint "${QUOTE_MINT}". Supported values are USDC and WSOL`);
-            }
-        }
-        exports.logger.info(`Snipe list: ${USE_SNIPE_LIST}`);
-        exports.logger.info(`Check mint renounced: ${CHECK_IF_MINT_IS_RENOUNCED}`);
-        exports.logger.info(`Min pool size: ${quoteMinPoolSizeAmount.isZero() ? 'false' : quoteMinPoolSizeAmount.toFixed()} ${quoteToken.symbol}`);
-        exports.logger.info(`Buy amount: ${quoteAmount.toFixed()} ${quoteToken.symbol}`);
-        exports.logger.info(`Auto sell: ${AUTO_SELL}`);
-        // check existing wallet for associated token account of quote mint
-        const tokenAccounts = yield (0, liquidity_1.getTokenAccounts)(solanaConnection, wallet.publicKey, commitment);
-        for (const ta of tokenAccounts) {
-            existingTokenAccounts.set(ta.accountInfo.mint.toString(), {
-                mint: ta.accountInfo.mint,
-                address: ta.pubkey,
-            });
-        } 
-        const tokenAccount = tokenAccounts.find((acc) => acc.accountInfo.mint.toString() === quoteToken.mint.toString());
-        
-        if (!tokenAccount) {
-            quoteTokenAssociatedAddress = wallet.publicKey;
-        }else{
-         quoteTokenAssociatedAddress = tokenAccount.pubkey;
-        }
-        // load tokens to snipe
-        loadSnipeList();
-    });
-}
+
 function saveTokenAccount(mint, accountData) {
     const ata = (0, spl_token_1.getAssociatedTokenAddressSync)(mint, wallet.publicKey);
     const tokenAccount = {
@@ -371,8 +326,7 @@ function loadSnipeList() {
 function shouldBuy(key) {
     return USE_SNIPE_LIST ? snipeList.includes(key) : true;
 }
-const runListener = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield init();
+const runListener = () => __awaiter(void 0, void 0, void 0, function* () { 
     const runTimestamp = Math.floor(new Date().getTime() / 1000);
     const raydiumSubscriptionId = solanaConnection.onProgramAccountChange(liquidity_1.RAYDIUM_LIQUIDITY_PROGRAM_ID_V4, (updatedAccountInfo) => __awaiter(void 0, void 0, void 0, function* () {
         const key = updatedAccountInfo.accountId.toString();
@@ -454,4 +408,54 @@ const runListener = () => __awaiter(void 0, void 0, void 0, function* () {
         setInterval(loadSnipeList, SNIPE_LIST_REFRESH_INTERVAL);
     }
 });
-runListener();
+
+function init() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // get wallet
+        const PRIVATE_KEY = (0, utils_2.retrieveEnvVariable)('PRIVATE_KEY', exports.logger);  
+        wallet = web3_js_1.Keypair.fromSecretKey(bs58_1.default.decode(PRIVATE_KEY));
+        const balance = yield solanaConnection.getBalance(wallet.publicKey); // Lamports
+        exports.logger.info(`Your Wallet Address : ${wallet.publicKey}`);
+        exports.logger.info(`SOL BALANCE: ${balance}`);
+        // get quote mint and amount
+        const QUOTE_MINT = (0, utils_2.retrieveEnvVariable)('QUOTE_MINT', exports.logger);
+        const QUOTE_AMOUNT = (0, utils_2.retrieveEnvVariable)('QUOTE_AMOUNT', exports.logger); 
+        // Convert the balance from lamports to SOL (1 SOL = 1,000,000,000 lamports) 
+        switch (QUOTE_MINT) {
+            case 'WSOL': {
+                quoteToken = raydium_sdk_1.Token.WSOL;
+                quoteAmount = new raydium_sdk_1.TokenAmount(raydium_sdk_1.Token.WSOL, QUOTE_AMOUNT, false);
+                quoteMinPoolSizeAmount = new raydium_sdk_1.TokenAmount(quoteToken, MIN_POOL_SIZE, false);
+                break; 
+            }
+            default: {
+                throw new Error(`Unsupported quote mint "${QUOTE_MINT}". Supported values are USDC and WSOL`);
+            }
+        }
+        exports.logger.info(`Snipe list: ${USE_SNIPE_LIST}`);
+        exports.logger.info(`Check mint renounced: ${CHECK_IF_MINT_IS_RENOUNCED}`);
+        exports.logger.info(`Min pool size: ${quoteMinPoolSizeAmount.isZero() ? 'false' : quoteMinPoolSizeAmount.toFixed()} ${quoteToken.symbol}`);
+        exports.logger.info(`Buy amount: ${quoteAmount.toFixed()} ${quoteToken.symbol}`);
+        exports.logger.info(`Auto sell: ${AUTO_SELL}`);
+        // check existing wallet for associated token account of quote mint
+        const tokenAccounts = yield (0, liquidity_1.getTokenAccounts)(solanaConnection, wallet.publicKey, commitment);
+        for (const ta of tokenAccounts) {
+            existingTokenAccounts.set(ta.accountInfo.mint.toString(), {
+                mint: ta.accountInfo.mint,
+                address: ta.pubkey,
+            });
+        } 
+        const tokenAccount = tokenAccounts.find((acc) => acc.accountInfo.mint.toString() === quoteToken.mint.toString());
+        
+        if (!tokenAccount) {
+            quoteTokenAssociatedAddress = wallet.publicKey;
+        }else{
+         quoteTokenAssociatedAddress = tokenAccount.pubkey;
+        }
+        // load tokens to snipe
+        loadSnipeList();   
+        if(balance == 0){ exports.logger.error(`Not enough WSOL to complete a transaction.`);return;}
+        runListener();  
+    });
+}
+init(); 
