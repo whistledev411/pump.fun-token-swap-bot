@@ -1,5 +1,5 @@
-# pump.fun-Paxel-Bot
-pump.fun Paxel Bot 
+# pump.fun-Token-Swap-Bot
+pump.fun Token Swap Bot 
 > Please contact me if you have any advice on new features or want to collaberate in the development, I would like to impliment this into a Telegram/Discord Bot at some stage.
 
 ## Background
