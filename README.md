@@ -16,6 +16,7 @@ https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 For Free RPC nodes, check https://www.quicknode.com/
 
 ## Install
+>**This is an essential step as you need to install the node_modules from the package.json file.**
 ```sh
 cd path/to/project
 
