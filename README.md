@@ -12,11 +12,12 @@ pump.fun Token Swap Bot
 ## Pre requisites
 - Install
 https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+- Follow the answer if you have any issues with node/npm not being recognised : https://stackoverflow.com/questions/27864040/fixing-npm-path-in-windows-8-and-10
 
 For Free RPC nodes, check https://www.quicknode.com/
 
 ## Install
->**This is an essential step as you need to install the node_modules from the package.json file.**
+>**This is only required if you have any module load errors**
 ```sh
 cd path/to/project
 
