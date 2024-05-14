@@ -1,5 +1,5 @@
 {
-  "name": "pump-fun-sniper-bot",
+  "name": "pump-fun-bot",
   "version": "1.0.0",
   "description": "Your project description",
   "main": "index.js",
@@ -16,6 +16,7 @@
     "bigint-buffer": "^1.1.5",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.1",
     "pino": "^8.18.0",
     "pino-pretty": "^10.3.1",
@@ -31,6 +32,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
-  "author": "Your Name",
+  "author": "James",
   "license": "ISC"
 }

@@ -17,3 +17,4 @@ exports.PRIVATE_KEY = (0, utils_1.retrieveEnvVariable)('PRIVATE_KEY', utils_1.lo
 exports.QUOTE_MINT = (0, utils_1.retrieveEnvVariable)('QUOTE_MINT', utils_1.logger);
 exports.QUOTE_AMOUNT = (0, utils_1.retrieveEnvVariable)('QUOTE_AMOUNT', utils_1.logger);
 exports.MIN_POOL_SIZE = (0, utils_1.retrieveEnvVariable)('MIN_POOL_SIZE', utils_1.logger);
+exports.MAX_STAKE_AMOUNT = (0, utils_1.retrieveEnvVariable)('MAX_STAKE_AMOUNT', utils_1.logger);

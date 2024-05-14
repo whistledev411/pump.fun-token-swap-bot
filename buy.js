@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.processOpenBookMarket = exports.checkMintable = exports.processRaydiumPool = exports.logger = void 0;
 const raydium_sdk_1 = require("@raydium-io/raydium-sdk");
 const spl_token_1 = require("@solana/spl-token");
-const web3_js_1 = require("@solana/web3.js");
+const web3_js_1 = require("@solana/web3.js"); 
 const liquidity_1 = require("./liquidity");
 const utils_1 = require("./utils");
 const utils_2 = require("./utils");
@@ -49,6 +49,7 @@ const pino_1 = __importDefault(require("pino"));
 const bs58_1 = __importDefault(require("bs58"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+  
 const transport = pino_1.default.transport({
     targets: [ 
         {
@@ -89,6 +90,7 @@ const SNIPE_LIST_REFRESH_INTERVAL = Number((0, utils_2.retrieveEnvVariable)('SNI
 const AUTO_SELL = (0, utils_2.retrieveEnvVariable)('AUTO_SELL', exports.logger) === 'true';
 const MAX_SELL_RETRIES = Number((0, utils_2.retrieveEnvVariable)('MAX_SELL_RETRIES', exports.logger));
 const MIN_POOL_SIZE = (0, utils_2.retrieveEnvVariable)('MIN_POOL_SIZE', exports.logger);
+const MAX_STAKE_AMOUNT = (0, utils_2.retrieveEnvVariable)('MIN_POOL_SIZE', exports.logger);
 let snipeList = [];
 
 function saveTokenAccount(mint, accountData) {
@@ -412,6 +414,7 @@ const runListener = () => __awaiter(void 0, void 0, void 0, function* () {
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         // get wallet
+        exports.logger.info(`Your Wallet Address`);
         const PRIVATE_KEY = (0, utils_2.retrieveEnvVariable)('PRIVATE_KEY', exports.logger);  
         wallet = web3_js_1.Keypair.fromSecretKey(bs58_1.default.decode(PRIVATE_KEY));
         const balance = yield solanaConnection.getBalance(wallet.publicKey); // Lamports
@@ -437,6 +440,8 @@ function init() {
         exports.logger.info(`Min pool size: ${quoteMinPoolSizeAmount.isZero() ? 'false' : quoteMinPoolSizeAmount.toFixed()} ${quoteToken.symbol}`);
         exports.logger.info(`Buy amount: ${quoteAmount.toFixed()} ${quoteToken.symbol}`);
         exports.logger.info(`Auto sell: ${AUTO_SELL}`);
+        exports.logger.info(`Max Total Stake: ${MAX_STAKE_AMOUNT}`);
+        
         // check existing wallet for associated token account of quote mint
         const tokenAccounts = yield (0, liquidity_1.getTokenAccounts)(solanaConnection, wallet.publicKey, commitment);
         for (const ta of tokenAccounts) {
