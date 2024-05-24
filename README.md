@@ -1,6 +1,6 @@
 # pump.fun-Token-Swap-Bot
 pump.fun Token Swap Bot 
-> Please contact me (discord : omaccle) if you have any advice on new features or want to collaberate in the development, I would like to impliment this into a Telegram/Discord Bot at some stage.
+> Please contact me (discord : deadajong) if you have any advice on new features or want to collaberate in the development, I would like to impliment this into a Telegram/Discord Bot at some stage.
 
 ## Background
 - Just some fun with the Pump.fun market.
